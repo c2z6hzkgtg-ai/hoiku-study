@@ -1,0 +1,69 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#f5f5f7"><title>公務員保育士 移動時間トレーナー</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif}main{max-width:720px;margin:auto;padding:14px 14px 40px}.brand{font-size:25px;font-weight:800}.sub,.small{color:#6e6e73;font-size:13px;line-height:1.6}.card{background:#fff;border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 1px 4px #0001}.days{font-size:38px;font-weight:850}.tag{display:inline-block;background:#eef4ff;color:#06c;border-radius:99px;padding:5px 9px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:#f2f2f7;border-radius:14px;padding:11px}.stat b{display:block;font-size:22px}button,select,input{font:inherit}button{width:100%;min-height:48px;border:0;border-radius:14px;padding:10px;background:#f2f2f7;font-weight:650}button.primary{background:#007aff;color:#fff}.row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}select,input{width:100%;min-height:48px;border:1px solid #d8d8dd;border-radius:13px;padding:9px;background:white}label{display:block;color:#6e6e73;font-size:12px;margin:7px 0 4px}.hidden{display:none}.q{font-size:19px;font-weight:750;line-height:1.65;margin:13px 0}.opt{text-align:left;margin:7px 0}.correct{background:#dff7e5!important}.wrong{background:#ffe2e0!important}.explain{background:#f2f2f7;border-radius:13px;padding:11px;line-height:1.65}.progress{height:7px;background:#e5e5ea;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:#007aff}.line{border-top:1px solid #eee;margin:14px 0}li{line-height:1.8}
+</style></head><body><main>
+<div class="brand">🎓 公務員保育士<br>移動時間トレーナー</div><div class="sub">電車・バス・待ち時間の5〜15分で合格力を積み上げる</div>
+
+<section class="card"><span class="tag">試験カウントダウン</span><div id="days" class="days">試験日を設定してください</div><div id="dateText" class="small"></div><div class="actions" style="margin-top:12px"><button class="primary" onclick="start('today')">今日の10問</button><button onclick="start('weak')">苦手だけ10問</button></div></section>
+
+<section class="card"><h2>📱 移動時間モード</h2><div class="row"><div><label>時間</label><select id="mins"><option value="5">5分</option><option value="10" selected>10分</option><option value="15">15分</option></select></div><div><label>分野</label><select id="sub"><option value="all">全部</option><option>保育原理</option><option>保育の心理学</option><option>子どもの保健</option><option>子ども家庭福祉</option><option>社会福祉</option><option>社会的養護</option><option>障害児保育</option><option>判断推理</option><option>数的推理</option><option>文章理解</option><option>社会科学</option></select></div></div><button class="primary" style="margin-top:9px" onclick="start('custom')">この条件で始める</button><p class="small">5分なら5問、10分なら10問、15分なら15問を目安に出題します。</p></section>
+
+<section id="quiz" class="card hidden"><span id="qtag" class="tag"></span> <span id="cnt" class="small"></span><div class="progress" style="margin-top:10px"><div id="bar" class="bar"></div></div><div id="q" class="q"></div><div id="opts"></div><div id="exp" class="explain hidden"></div><button id="next" class="primary hidden" style="margin-top:9px" onclick="next()">次へ</button></section>
+
+<section id="result" class="card hidden"><h2>🎉 セッション終了</h2><div id="rs" class="days"></div><p id="rm" class="small"></p><div class="actions"><button class="primary" onclick="start('today')">もう一度</button><button onclick="start('weak')">苦手を復習</button></div></section>
+
+<section class="card"><h2>📊 成績</h2><div class="grid"><div class="stat">解答数<b id="t">0</b></div><div class="stat">正解数<b id="c">0</b></div><div class="stat">正答率<b id="r">0%</b></div><div class="stat">苦手<b id="w">0</b></div></div><div class="line"></div><div id="ss" class="small">まだ成績がありません。</div></section>
+
+<section class="card"><h2>⚙️ 試験日</h2><label>目標試験日</label><input id="date" type="date"><button class="primary" style="margin-top:9px" onclick="saveDate()">試験日を保存</button><p class="small">札幌・旭川・富良野など、実際に受ける自治体の試験日に合わせて設定してください。</p><div class="actions"><button onclick="exportData()">学習データ保存</button><button onclick="resetData()">成績リセット</button></div></section>
+
+<section class="card"><h2>🧠 使い方</h2><ul><li>通学中は「今日の10問」</li><li>間違えた問題は自動で苦手登録</li><li>次回は「苦手だけ10問」で復習</li><li>試験日を設定すると残り日数を表示</li></ul><p class="small">練習問題です。最新の試験日・出題範囲は各自治体の募集要項で確認してください。</p></section>
+</main>
+<script>
+const Q=[
+["保育原理","子どもの主体性を尊重する保育は？",["一切声をかけない","興味や意思を踏まえ必要な援助をする","全員同じ活動にする","大人が全て決める"],1,"主体性の尊重は放任ではなく、環境構成や必要な援助を行います。"],
+["保育原理","保育計画の改善で重要なのは？",["毎年同じ計画を使う","子どもの姿を評価し次の計画に生かす","評価しない","保育者の都合だけで変える"],1,"計画・実践・評価・改善の循環が重要です。"],
+["保育原理","環境を通して行う保育とは？",["説明だけで学ばせる","環境との関わりを通して経験を支える","自由遊びをなくす","教材を使わない"],1,"人的・物的環境との関わりを大切にします。"],
+["保育の心理学","愛着について適切なのは？",["安定した養育者との関係は安心感の基盤","言葉が話せてから形成","全員同じ形","一人で過ごすほど強い"],0,"安定した関係は安心感や探索の基盤になります。"],
+["保育の心理学","発達の個人差を捉えるには？",["年齢だけで判断","発達過程や生活背景を踏まえる","早い子に全員を合わせる","遅い子の活動を減らす"],1,"発達には個人差があります。"],
+["保育の心理学","遊びの意義として適切なのは？",["発達と無関係","主体的活動を通して多様な経験をする","学習の邪魔","大人が全て決める"],1,"遊びは主体的な活動で心身の発達に関わります。"],
+["子どもの保健","健康観察で重要なのは？",["体温だけ","表情・食欲・活動性など普段との差を見る","一度見れば十分","保護者の話だけ"],1,"日常との変化を総合的に捉えます。"],
+["子どもの保健","感染症予防の基本は？",["換気しない","手洗い・換気・環境衛生などを組み合わせる","体調不良でも登園","タオルを共用"],1,"複数の基本的対策を組み合わせます。"],
+["子どもの保健","事故予防で重要なのは？",["事故後だけ対応","危険を予測し事前に環境を整える","子どもだけに注意させる","危険箇所を放置"],1,"危険予測と環境整備が基本です。"],
+["子ども家庭福祉","児童福祉法上の児童は原則何歳未満？",["15歳","18歳","20歳","22歳"],1,"原則18歳未満です。"],
+["子ども家庭福祉","子どもの権利を尊重する支援は？",["大人だけで決める","発達に応じて意見表明の機会を保障する","意見を聞かない","全員同じ対応"],1,"子どもの意見を聴くことが重要です。"],
+["子ども家庭福祉","子育て支援で重要なのは？",["保護者を評価","保護者の意向や家庭状況を踏まえる","家庭に関わらない","全て施設に任せる"],1,"意向や状況を踏まえた支援が必要です。"],
+["社会福祉","ソーシャルワークで重視するのは？",["強みを無視","ニーズや強みに着目","価値観を押し付ける","本人だけの責任にする"],1,"本人のニーズと強み、環境に着目します。"],
+["社会福祉","相談援助で信頼関係を築くには？",["一方的に指示","話を聴き理解しようとする","話を遮る","記録しない"],1,"傾聴と理解する姿勢が基盤です。"],
+["社会福祉","自己決定の尊重とは？",["代わりに全て決める","本人が選択・決定できるよう支援する","家族だけで決める","支援者都合を優先"],1,"情報提供などを行い本人の意思を尊重します。"],
+["社会的養護","社会的養護で重視されるのは？",["施設の都合","子どもの権利と最善の利益","一律対応","意見を聞かない"],1,"権利擁護と最善の利益を中心に考えます。"],
+["社会的養護","里親制度の特徴は？",["家庭的環境で養育する","全員施設で養育","教育だけ","交流を必ず禁止"],0,"家庭的な環境で養育する制度です。"],
+["障害児保育","障害児保育で大切なのは？",["全員同じ方法","特性や発達に応じ環境・援助を工夫","できないことだけ繰り返す","参加を制限"],1,"個々の特性に応じた支援を行います。"],
+["障害児保育","合理的配慮に近いのは？",["必要な調整を行う","全員同じ配慮","配慮しない","本人の意向を聞かない"],0,"本人の状況に応じ必要な調整を行います。"],
+["判断推理","AはBより上位、CはAより下位。最上位は？",["A","B","C","不明"],0,"AはBより上位でCはAより下位です。"],
+["判断推理","PはQより左、RはPより右。左端になり得るのは？",["P","Q","R","QとR"],0,"PはQとRより左です。"],
+["判断推理","AはBより年上、CはDより年上。確実なのは？",["Aが最年長","Cが最年長","A>B、C>D","B>D"],2,"確実なのは各ペアの順序です。"],
+["数的推理","2000円の20%引きはいくら？",["1400","1500","1600","1800"],2,"2000×0.8＝1600円。"],
+["数的推理","時速60kmで30分。何km？",["20","30","40","60"],1,"60×0.5＝30km。"],
+["数的推理","24個を3人で均等に分けると？",["6","8","10","12"],1,"24÷3＝8です。"],
+["数的推理","ある数の25%が20。その数は？",["50","60","80","100"],2,"20÷0.25＝80です。"],
+["文章理解","継続的に観察するとは？",["一度だけ見る","時間の経過による変化を捉える","結果だけ見る","記録しない"],1,"時間の経過に沿って変化を捉えます。"],
+["文章理解","主体性の尊重と放任の違いは？",["必要な援助や環境構成を行う","大人は何もしない","放任の方が計画的","違いなし"],0,"主体性を尊重しながら保育者は援助します。"],
+["社会科学","基本的人権について適切なのは？",["原則として全ての人に保障","公務員にはない","子どもにはない","施設入所者にはない"],0,"基本的人権は憲法上保障されています。"],
+["社会科学","地方自治の基本的な考え方に含まれるのは？",["住民自治","中央政府だけで決定","地方の意見を認めない","自治体に権限はない"],0,"地方自治には住民自治と団体自治があります。"]
+];
+let S=load(),list=[],i=0,sc=0,done=false;
+function load(){try{return JSON.parse(localStorage.getItem("hoikuTrainer4"))||{t:0,c:0,w:[],sub:{},date:""}}catch(e){return{t:0,c:0,w:[],sub:{},date:""}}}
+function save(){localStorage.setItem("hoikuTrainer4",JSON.stringify(S))}
+function sh(a){return a.slice().sort(()=>Math.random()-.5)}
+function days(){if(!S.date){document.getElementById("days").textContent="試験日を設定してください";return}let a=new Date(S.date+"T00:00:00"),n=new Date(),d=Math.ceil((a-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/86400000);document.getElementById("days").textContent=d>=0?"あと "+d+" 日":"試験日を過ぎています";document.getElementById("dateText").textContent="目標："+S.date}
+function saveDate(){S.date=document.getElementById("date").value;save();days();alert("保存しました")}
+function start(mode){let a;if(mode==="weak")a=sh(S.w.map(x=>Q[x]).filter(Boolean));else{let s=document.getElementById("sub").value;a=sh(Q.filter(x=>s==="all"||x[0]===s))}let n=mode==="today"?10:(mode==="weak"?10:+document.getElementById("mins").value);list=a.slice(0,n);if(!list.length){alert("該当する問題がありません");return}i=0;sc=0;document.getElementById("quiz").classList.remove("hidden");document.getElementById("result").classList.add("hidden");show();scrollTo(0,0)}
+function show(){done=false;let x=list[i];document.getElementById("qtag").textContent=x[0];document.getElementById("cnt").textContent=` ${i+1}/${list.length}`;document.getElementById("bar").style.width=(i/list.length*100)+"%";document.getElementById("q").textContent=x[1];document.getElementById("exp").classList.add("hidden");document.getElementById("next").classList.add("hidden");let o=document.getElementById("opts");o.innerHTML="";x[2].forEach((v,j)=>{let b=document.createElement("button");b.className="opt";b.textContent=`${j+1}. ${v}`;b.onclick=()=>answer(j,b);o.appendChild(b)})}
+function answer(j,b){if(done)return;done=true;let x=list[i],qi=Q.indexOf(x),ok=j===x[3];S.t++;S.sub[x[0]]??={t:0,c:0};S.sub[x[0]].t++;document.querySelectorAll(".opt").forEach((z,k)=>{z.disabled=true;if(k===x[3])z.classList.add("correct")});if(ok){sc++;S.c++;S.sub[x[0]].c++;S.w=S.w.filter(v=>v!==qi)}else{b.classList.add("wrong");if(!S.w.includes(qi))S.w.push(qi)}save();stats();let e=document.getElementById("exp");e.classList.remove("hidden");e.innerHTML=(ok?"⭕ <b>正解</b>":"❌ <b>不正解</b>　正解："+x[2][x[3]])+"<br>"+x[4];document.getElementById("next").textContent=i===list.length-1?"結果を見る":"次へ";document.getElementById("next").classList.remove("hidden");document.getElementById("bar").style.width=((i+1)/list.length*100)+"%"}
+function next(){i++;i>=list.length?finish():show()}
+function finish(){document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.remove("hidden");let r=Math.round(sc/list.length*100);document.getElementById("rs").textContent=`${sc}/${list.length}問`;document.getElementById("rm").textContent=`正答率 ${r}%。${r>=80?"いいペースです！":"「苦手だけ10問」で間違えた問題を復習しましょう。"}`}
+function stats(){document.getElementById("t").textContent=S.t;document.getElementById("c").textContent=S.c;document.getElementById("r").textContent=S.t?Math.round(S.c/S.t*100)+"%":"0%";document.getElementById("w").textContent=S.w.length;let a=Object.entries(S.sub);document.getElementById("ss").innerHTML=a.length?a.map(x=>`${x[0]}：${x[1].c}/${x[1].t}（${Math.round(x[1].c/x[1].t*100)}%）`).join("<br>"):"まだ成績がありません。"}
+function exportData(){let b=new Blob([JSON.stringify(S,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="公務員保育士_学習データ.json";a.click()}
+function resetData(){if(confirm("成績・苦手・試験日をリセットしますか？")){S={t:0,c:0,w:[],sub:{},date:""};save();document.getElementById("date").value="";days();stats()}}
+document.getElementById("date").value=S.date;days();stats();
+</script></body></html>
